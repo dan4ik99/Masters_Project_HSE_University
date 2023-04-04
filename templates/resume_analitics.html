@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+<p> </p>
+<p> </p>
+<form action="{{url_for('ResumeAnalitics')}}" method="POST">
+<div class="form_radio_btn">
+	<input id="radio-1" type="radio" name="radio_button" value="tech">
+	<label for="radio-1">Технические резюме</label>
+</div>
+<div class="form_radio_btn">
+	<input id="radio-2" type="radio" name="radio_button" value="no_tech">
+	<label for="radio-2">Не технические резюме</label>
+</div>
+<input type="submit" value="Выбрать">
+</form>
+<p> </p>
+<p> </p>
+
+<div class="con">
+    <div id="con1"><b>Средний уровень З/П по данным резюме лиц с ОВЗ</b></div>
+    <div id="con2"><b>Кол-во вакансий по типу занятости</b></div>
+</div>
+
+<div class="container">
+
+<div style="height: 35vh; width: 45%;">
+    <canvas id="myChart"></canvas>
+</div>
+
+<script>
+        const labels = {{ labels1 | tojson}};
+
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Средняя З/П по данным резюме',
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgb(255, 99, 132)',
+                data: {{ data | tojson}},
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: { maintainAspectRatio: false }
+        };
+
+        const myChart = new Chart(
+            document.getElementById('myChart'),
+            config
+        );
+</script>
+
+<canvas id="chart" style="height: 35vh; width: 45%;"></canvas>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js'></script>
+<script>
+      // bar chart data
+      var barData = {
+        labels : [
+          {% for item in labels %}
+           "{{ item }}",
+          {% endfor %}
+	             ],
+
+        datasets : [{
+          fillColor: "rgba(235, 40, 40, 0.17)",
+          strokeColor: "rgba(255, 99, 132)",
+          pointColor: "rgba(151,187,205,1)",
+
+        data : [
+            {% for item in values %}
+               "{{ item }}",
+              {% endfor %}
+	            ]
+                   }
+                   ]
+      }
+
+     // get bar chart canvas
+     var mychart = document.getElementById("chart").getContext("2d");
+
+       steps = 10
+       max = {{max}}
+
+
+
+     // draw bar chart
+     new Chart(mychart).Bar(barData, {
+       scaleOverride: true,
+       scaleSteps: steps,
+       scaleStepWidth: Math.ceil(max / steps),
+       scaleStartValue: 0,
+       scaleShowVerticalLines: true,
+       scaleShowGridLines : true,
+       barShowStroke : true,
+       scaleShowLabels: true
+       }
+
+     );
+</script>
+</div>
+{% endblock %}
