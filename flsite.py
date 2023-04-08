@@ -70,7 +70,9 @@ def index():
     '''
     dbase = FDataBase(db)
     print(dbase.getMenu())
-    return render_template('index.html', menu = dbase.getMenu(), posts=dbase.getVacancyAnonce())
+    return render_template('index.html',
+                           menu = dbase.getMenu(),
+                           vacancy=dbase.getVacancyAnonce())
 
 @app.route("/add_vacancy", methods=["POST", "GET"])
 def addVacancy():
@@ -144,7 +146,25 @@ def showVacancy(id_vacancy):
     if not description:
         abort(404)
 
-    return render_template('post.html', menu=dbase.getMenu(), title=name, post=description)
+    return render_template('vacancy_page.html', menu=dbase.getMenu(), title=name, post=description)
+
+@app.route("/resume/<int:id_resume>")
+def showResume(id_resume):
+    db = get_db()
+    dbase = FDataBase(db)
+    profession, description = dbase.getResume(id_resume)
+    if not profession:
+        abort(404)
+
+    return render_template('resume_page.html', menu=dbase.getMenu(), description=description)
+
+@app.route("/resume_list")
+def resumeList():
+    db = get_db()
+    dbase = FDataBase(db)
+    return render_template('resume_list.html',
+                           menu=dbase.getMenu(),
+                           resume=dbase.getResumeAnonce())
 
 
 if __name__ == "__main__":

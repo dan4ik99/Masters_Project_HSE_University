@@ -14,11 +14,11 @@
 <hr>
 <h3>Список опубликованных вакансий</h3>
 <ul class="list-posts">
-{% for p in posts %}
+{% for p in vacancy %}
 <li>
     <!-- Url в alias читается из базы данных -->
 <p class="title"><a href="{{ url_for('showVacancy', id_vacancy=p.id)}}">{{p.name}}</a></p>
-<p class="annonce">{{ p.description[:50] | striptags  }}</p>
+<p class="annonce">{{ p.description[:50] | striptags  }}....</p>
 </li>
 {% endfor %}
 </ul>

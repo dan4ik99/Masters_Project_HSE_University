@@ -1,0 +1,19 @@
+<!-- Шаблон помогает создавать несколько страниц сайта с одинаковой структурой
+ + добавлять в каждую страницу какие-то свои тонкости
+расширяем базовый шаблон base html.-->
+{% extends 'base.html' %}
+
+{% block content %}
+{{ super() }}
+<hr>
+<h3>Список опубликованных резюме лиц с ОВЗ</h3>
+<ul class="list-posts">
+{% for p in resume %}
+<li>
+    <!-- Url в alias читается из базы данных -->
+<p class="title"><a href="{{ url_for('showResume', id_resume=p.id)}}">{{p.profession}}</a></p>
+<p class="annonce">{{ p.description[:50] | striptags  }}....</p>
+</li>
+{% endfor %}
+</ul>
+{% endblock %}

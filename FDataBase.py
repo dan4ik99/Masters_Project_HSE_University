@@ -82,3 +82,25 @@ class FDataBase:
             if res: return res
         except sqlite3.Error as e:
             print("Ошибка получения данных резюме из БД "+str(e))
+
+
+    def getResumeAnonce(self):
+        try:
+            self.__cur.execute(f"SELECT id, profession, description FROM resume")
+            res = self.__cur.fetchall()
+            if res: return res
+        except sqlite3.Error as e:
+            print("Ошибка получения вакансии из БД "+str(e))
+
+        return []
+
+    def getResume(self, resumeId):
+        try:
+            self.__cur.execute(f"SELECT profession, description FROM resume WHERE id = {resumeId} LIMIT 1")
+            res = self.__cur.fetchone()
+            if res:
+                return res
+        except sqlite3.Error as e:
+            print("Ошибка получения вакансии из БД "+str(e))
+
+        return (False, False)
