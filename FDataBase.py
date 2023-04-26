@@ -1,6 +1,8 @@
 import sqlite3
 import time
 import math
+from datetime import datetime
+from datetime import date
 import re
 from flask import url_for
 
@@ -33,7 +35,7 @@ class FDataBase:
                 print("Вакансия с таким id уже существует")
                 return False
             '''
-            tm = math.floor(time.time())
+            tm = date.today()
             self.__cur.execute("INSERT INTO vacancy VALUES(NULL, ?, ?, ?, ?, ?, ?)",
                                (name, city, salary, schedule, description, tm))
             self.__db.commit()
@@ -46,7 +48,7 @@ class FDataBase:
     # Данный метод возвращает краткое описание вакансии на отдельной странице (с новыми полями после доменного имени)
     def getVacancy(self, vacancyId):
         try:
-            self.__cur.execute(f"SELECT name, description FROM vacancy WHERE id = {vacancyId} LIMIT 1")
+            self.__cur.execute(f"SELECT name, time FROM vacancy WHERE id = {vacancyId} LIMIT 1")
             res = self.__cur.fetchone()
             if res:
                 return res
@@ -104,3 +106,22 @@ class FDataBase:
             print("Ошибка получения вакансии из БД "+str(e))
 
         return (False, False)
+
+    def addResume(self, age, gender, city, education_level, profession, restriction_type, description, desired_salary, schedule, resume_type, resume_vector):
+        today = datetime.now()
+        month = today.strftime("%b")
+        month_ru_eng = {'Jan': 'январь', 'Feb': 'февраль', 'Mar': 'март',
+                        'Apr': 'апрель', 'May': 'май', 'Jun': 'июнь',
+                        'Jul': 'июль', 'Aug': 'август', 'Sep': 'сентябрь',
+                        'Oct': 'октябрь', 'Nov': 'ноябрь', 'Dec': 'декабрь'}
+        sending_date_month = month_ru_eng[month]
+        try:
+            self.__cur.execute("INSERT INTO resume VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                               (age, gender, city, education_level, profession, restriction_type,
+                                description, desired_salary, sending_date_month, schedule, resume_type, resume_vector))
+            self.__db.commit()
+        except sqlite3.Error as e:
+            print("Ошибка добавления резюме в БД "+str(e))
+            return False
+
+        return True

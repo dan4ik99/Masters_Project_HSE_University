@@ -1,7 +1,10 @@
 import sqlite3
 import os
 from flask import Flask, render_template, g, request, flash, abort, Markup
+
+import vectorization
 from FDataBase import FDataBase
+from vectorization import Vectorization
 
 #Конфигурация
 DATABASE = 'flsite.db'
@@ -79,6 +82,7 @@ def addVacancy():
     db = get_db()
     dbase = FDataBase(db)
 
+
     if request.method == "POST":
         '''Поля post и name взяты из формы'''
         if len(request.form['name']) > 4 and len(request.form['description']) > 10:
@@ -142,11 +146,11 @@ def ResumeAnalitics():
 def showVacancy(id_vacancy):
     db = get_db()
     dbase = FDataBase(db)
-    name, description = dbase.getVacancy(id_vacancy)
-    if not description:
+    name, date = dbase.getVacancy(id_vacancy)
+    if not date:
         abort(404)
 
-    return render_template('vacancy_page.html', menu=dbase.getMenu(), title=name, post=description)
+    return render_template('vacancy_page.html', menu=dbase.getMenu(), title=name, date=date)
 
 @app.route("/resume/<int:id_resume>")
 def showResume(id_resume):
@@ -166,6 +170,31 @@ def resumeList():
                            menu=dbase.getMenu(),
                            resume=dbase.getResumeAnonce())
 
+@app.route("/add_resume", methods=["POST", "GET"])
+def addResume():
+    db = get_db()
+    dbase = FDataBase(db)
+
+    if request.method == "POST":
+        if len(request.form['profession']) > 4 and len(request.form['description']) > 10:
+
+
+
+            res = dbase.addResume(request.form['age'], request.form['gender'], request.form['city'],
+                                   request.form['education_level'], request.form['profession'],
+                                   request.form['restriction_type'], request.form['description'],
+                                   request.form['desired_salary'], request.form['schedule'], "tech",
+                                   Vectorization(request.form['description']).input_text_preprocessing())
+            if not res:
+                flash('Ошибка добавления резюме', category = 'error')
+            else:
+                flash('Резюме добавлено успешно', category='success')
+        else:
+            flash('Ошибка добавления резюме', category='error')
+
+    return render_template('add_resume.html',
+                           menu = dbase.getMenu(),
+                           title="Добавление резюме")
 
 if __name__ == "__main__":
     app.run(debug=True)

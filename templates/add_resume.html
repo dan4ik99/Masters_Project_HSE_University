@@ -8,12 +8,16 @@
 {% endfor %}
 <!-- addVacancy - имя функции представления. Имя функции обработчика данного запроса -->
 <!-- addVacancy - имя функции представления. Имя функции обработчика данного запроса -->
-<form action="{{url_for('addVacancy')}}" method="post" id="form" class="topBefore">
-<input id="name" type="text" name="name" placeholder="Название вакансии">
+<form action="{{url_for('addResume')}}" method="post" id="form" class="topBefore">
+<input id="age" type="text" name="age" placeholder="Возраст">
+<input id="gender" type="text" name="gender" placeholder="Пол">
 <input id="city" type="text" name="city" placeholder="Город">
-<input id="salary" type="text" name="salary" placeholder="Уровень З/П">
+<input id="education_level" type="text" name="education_level" placeholder="Уровень образования">
+<input id="profession" type="text" name="profession" placeholder="Желаемый профиль работы">
+<input id="restriction_type" type="text" name="restriction_type" placeholder="Ограничения здоровья">
+<textarea id="description" type="text" name="description" placeholder="Релевантный опыт работы/умения/навыки"></textarea>
+<input id="desired_salary" type="text" name="desired_salary" placeholder="Желаемый уровень З/П">
 <input id="schedule" type="text" name="schedule" placeholder="Тип занятости">
-<textarea id="text" type="text" name="description" placeholder="Описание вакансии"></textarea>
 <input id="submit" type="submit" value="Добавить">
 </form>
 
