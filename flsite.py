@@ -161,18 +161,27 @@ def showVacancy(id_vacancy):
         vacancy_vector.append(row['vacancy_vector'])
         resume_id.append(row['resume_id'])
         resume_vector.append(row['resume_vector'])
+
     df = pd.DataFrame({'vacancy_id':vacancy_id, 'vacancy_vector':vacancy_vector,
                        'resume_id':resume_id, 'resume_vector':resume_vector})
+
     df['resume_array'] = df['resume_vector'].apply(lambda i: np.array(i.split('_')).astype('int'))
     df['vacancy_array'] = df['vacancy_vector'].apply(lambda i: np.array(i.split('_')).astype('int'))
-    similarity = [df['resume_array'][i] @ df['vacancy_array'][i] / norm(df['resume_array'][i]) / norm(df['vacancy_array'][i]) for i in range(len(df))]
+
+    similarity = [df['resume_array'][i] @ df['vacancy_array'][i] / norm(df['resume_array'][i]) / norm(df['vacancy_array'][i]) for i in range(len(df))] # косинусная близость вектора резюме и вектора вакансии
     df['similarity'] = similarity
+
+    df = df.sort_values(['similarity'], ascending=False).query("similarity >= 0.3").head(3)
+    # Для рекомендации отбираем только те резюме, которые имеют близость с вакансией >= 0.3
+    resume_id_list = f"{tuple(df.resume_id.unique())}" #[[{'resume_id':i}] for i in df.resume_id.unique()]
     print(df)
+
+    description = dbase.getResumeAnonceForRecommendation(resume_id_list)
 
     if not date:
         abort(404)
 
-    return render_template('vacancy_page.html', menu=dbase.getMenu(), title=name, date=date)
+    return render_template('vacancy_page.html', menu=dbase.getMenu(), title=name, date=date, resume=description)
 
 @app.route("/resume/<int:id_resume>")
 def showResume(id_resume):
@@ -188,7 +197,6 @@ def showResume(id_resume):
 def resumeList():
     db = get_db()
     dbase = FDataBase(db)
-    print(dbase.outer_join_vacancy_resume(13)[1]['resume_id'])
     return render_template('resume_list.html',
                            menu=dbase.getMenu(),
                            resume=dbase.getResumeAnonce())

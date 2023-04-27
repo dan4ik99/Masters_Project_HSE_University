@@ -5,6 +5,17 @@
 <p><b>Название вакансии:</b> {{ title }} </p>
 <p><b>Дата публикации:</b> {{ date }} </p>
 <h3>Топ 3 рекомендуемые вакансии</h3>
+
+<ul class="list-posts">
+{% for p in resume %}
+<li>
+    <!-- Url в alias читается из базы данных -->
+<p class="title"><a href="{{ url_for('showResume', id_resume=p.id)}}">{{p.profession}}</a></p>
+<p class="annonce">{{ p.description[:50] | striptags  }}....</p>
+</li>
+{% endfor %}
+</ul>
+
 <h3>Отклики на вакансию</h3>
 {{ description }}
 {% endblock %}

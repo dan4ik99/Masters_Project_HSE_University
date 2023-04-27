@@ -141,3 +141,13 @@ class FDataBase:
             print("Ошибка получения вакансии из БД "+str(e))
 
         return (False, False)
+
+    def getResumeAnonceForRecommendation(self, resume_id):
+        try:
+            self.__cur.execute(f"SELECT id, profession, description FROM resume WHERE id IN {resume_id}")
+            res = self.__cur.fetchall()
+            if res: return res
+        except sqlite3.Error as e:
+            print("Ошибка получения вакансии из БД "+str(e))
+
+        return []
