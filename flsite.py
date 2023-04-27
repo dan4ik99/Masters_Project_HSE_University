@@ -1,5 +1,9 @@
 import sqlite3
 import os
+import numpy as np
+from numpy.linalg import norm
+
+import pandas as pd
 from flask import Flask, render_template, g, request, flash, abort, Markup
 
 import vectorization
@@ -90,7 +94,8 @@ def addVacancy():
                Передается название и описание вакансии
             '''
             res = dbase.addVacancy(request.form['name'], request.form['city'], request.form['salary'],
-                                   request.form['schedule'], request.form['description'])
+                                   request.form['schedule'], request.form['description'],
+                                   Vectorization(request.form['description']).input_text_preprocessing())
             if not res:
                 flash('Ошибка добавления вакансии', category = 'error')
             else:
@@ -147,6 +152,23 @@ def showVacancy(id_vacancy):
     db = get_db()
     dbase = FDataBase(db)
     name, date = dbase.getVacancy(id_vacancy)
+    vacancy_id = []
+    vacancy_vector = []
+    resume_id = []
+    resume_vector = []
+    for row in dbase.outer_join_vacancy_resume(id_vacancy):
+        vacancy_id.append(row['vacancy_id'])
+        vacancy_vector.append(row['vacancy_vector'])
+        resume_id.append(row['resume_id'])
+        resume_vector.append(row['resume_vector'])
+    df = pd.DataFrame({'vacancy_id':vacancy_id, 'vacancy_vector':vacancy_vector,
+                       'resume_id':resume_id, 'resume_vector':resume_vector})
+    df['resume_array'] = df['resume_vector'].apply(lambda i: np.array(i.split('_')).astype('int'))
+    df['vacancy_array'] = df['vacancy_vector'].apply(lambda i: np.array(i.split('_')).astype('int'))
+    similarity = [df['resume_array'][i] @ df['vacancy_array'][i] / norm(df['resume_array'][i]) / norm(df['vacancy_array'][i]) for i in range(len(df))]
+    df['similarity'] = similarity
+    print(df)
+
     if not date:
         abort(404)
 
@@ -166,6 +188,7 @@ def showResume(id_resume):
 def resumeList():
     db = get_db()
     dbase = FDataBase(db)
+    print(dbase.outer_join_vacancy_resume(13)[1]['resume_id'])
     return render_template('resume_list.html',
                            menu=dbase.getMenu(),
                            resume=dbase.getResumeAnonce())

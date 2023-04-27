@@ -23,7 +23,7 @@ class FDataBase:
             print("Ошибка чтения из БД")
         return []
 
-    def addVacancy(self, name, city, salary, schedule, description):
+    def addVacancy(self, name, city, salary, schedule, description, vacancy_vector):
         try:
             # Проверка на то, существует ли запись с таким id
             # Потому что каждая вакансия должна иметь уникальный url
@@ -36,8 +36,8 @@ class FDataBase:
                 return False
             '''
             tm = date.today()
-            self.__cur.execute("INSERT INTO vacancy VALUES(NULL, ?, ?, ?, ?, ?, ?)",
-                               (name, city, salary, schedule, description, tm))
+            self.__cur.execute("INSERT INTO vacancy VALUES(NULL, ?, ?, ?, ?, ?, ?, ?)",
+                               (name, city, salary, schedule, description, tm, vacancy_vector))
             self.__db.commit()
         except sqlite3.Error as e:
             print("Ошибка добавления вакансии в БД "+str(e))
@@ -101,6 +101,7 @@ class FDataBase:
             self.__cur.execute(f"SELECT profession, description FROM resume WHERE id = {resumeId} LIMIT 1")
             res = self.__cur.fetchone()
             if res:
+                print(res)
                 return res
         except sqlite3.Error as e:
             print("Ошибка получения вакансии из БД "+str(e))
@@ -125,3 +126,18 @@ class FDataBase:
             return False
 
         return True
+
+    def outer_join_vacancy_resume(self, vacancy_id):
+        try:
+            self.__cur.execute(f"""
+                            SELECT v.id as "vacancy_id", v.vacancy_vector, r.id as "resume_id", r.resume_vector
+                            FROM vacancy v CROSS JOIN resume r
+                            WHERE v.id = {vacancy_id}
+                               """)
+            res = self.__cur.fetchall()
+            if res:
+                return res
+        except sqlite3.Error as e:
+            print("Ошибка получения вакансии из БД "+str(e))
+
+        return (False, False)

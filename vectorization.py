@@ -44,9 +44,11 @@ class Vectorization:
 
     def preprocessed_data_for_learning(self):
         data = pd.read_excel('vectorized_data.xlsx')
+        data['Preprocessed_texts_list'] = data['Preprocessed_texts']. \
+        apply(lambda i: i[2:len(i)-2].split("', '"))
         # Считаем частоту слов во всех описаниях резюме/вакансий
         words = Counter()
-        for txt in data['Preprocessed_texts']:
+        for txt in data['Preprocessed_texts_list']:
             words.update(txt)
         return words
 
@@ -148,7 +150,7 @@ class Vectorization:
                     results[i, index] += 1.
             return results
 
-        vectors = vectorize_sequences(description_df['Sequences'], max_words)
+        vectors = vectorize_sequences(description_df['Sequences'], max_words).astype('int')
         description_df['bow_vectors'] = list(vectors)
         vector = '_'.join(map(str, description_df.bow_vectors[0]))
         return vector
