@@ -171,9 +171,9 @@ def showVacancy(id_vacancy):
     similarity = [df['resume_array'][i] @ df['vacancy_array'][i] / norm(df['resume_array'][i]) / norm(df['vacancy_array'][i]) for i in range(len(df))] # косинусная близость вектора резюме и вектора вакансии
     df['similarity'] = similarity
 
-    df = df.sort_values(['similarity'], ascending=False).query("similarity >= 0.3").head(3)
+    df = df.sort_values(['similarity'], ascending=False).query("similarity >= 0.2").head(3)
     # Для рекомендации отбираем только те резюме, которые имеют близость с вакансией >= 0.3
-    resume_id_list = f"{tuple(df.resume_id.unique())}" #[[{'resume_id':i}] for i in df.resume_id.unique()]
+    resume_id_list = f"{tuple(df.resume_id.unique())}"
     print(df)
 
     description = dbase.getResumeAnonceForRecommendation(resume_id_list)
@@ -193,13 +193,23 @@ def showResume(id_resume):
 
     return render_template('resume_page.html', menu=dbase.getMenu(), description=description)
 
-@app.route("/resume_list")
+@app.route("/resume_list", methods=["POST", "GET"])
 def resumeList():
     db = get_db()
     dbase = FDataBase(db)
+    get_data_from_db = ""
+    schedule_type = {'full_day': 'Полная', 'part_time': 'Частичная'}
+    if request.method == "POST":
+        request_from_form = request.form.get('radio_button')
+        print(request_from_form)
+        if request_from_form == "full_day" or request_from_form == "part_time":
+            get_data_from_db = dbase.getResumeAnonceFilterSchedule(schedule_type[request_from_form])
+        elif request_from_form == "tech" or request_from_form == "no_tech":
+            get_data_from_db = dbase.getResumeAnonceFilterResumeType(request_from_form)
+
     return render_template('resume_list.html',
                            menu=dbase.getMenu(),
-                           resume=dbase.getResumeAnonce())
+                           resume=get_data_from_db)
 
 @app.route("/add_resume", methods=["POST", "GET"])
 def addResume():

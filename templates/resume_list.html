@@ -7,6 +7,28 @@
 {{ super() }}
 <hr>
 <h3>Список опубликованных резюме лиц с ОВЗ</h3>
+<p> </p>
+<form action="{{url_for('resumeList')}}" method="POST">
+<div class="form_radio_btn">
+	<input id="radio-1" type="radio" name="radio_button" value="tech">
+	<label for="radio-1">Технические резюме</label>
+</div>
+<div class="form_radio_btn">
+	<input id="radio-2" type="radio" name="radio_button" value="no_tech">
+	<label for="radio-2">Не технические резюме</label>
+</div>
+<div class="form_radio_btn">
+	<input id="radio-3" type="radio" name="radio_button" value="full_day">
+	<label for="radio-3">Полная занятость</label>
+</div>
+<div class="form_radio_btn">
+	<input id="radio-4" type="radio" name="radio_button" value="part_time">
+	<label for="radio-4">Частичная занятость</label>
+</div>
+<input type="submit" value="Выбрать">
+</form>
+<p></p>
+
 <ul class="list-posts">
 {% for p in resume %}
 <li>

@@ -86,9 +86,19 @@ class FDataBase:
             print("Ошибка получения данных резюме из БД "+str(e))
 
 
-    def getResumeAnonce(self):
+    def getResumeAnonceFilterResumeType(self, resume_type):
         try:
-            self.__cur.execute(f"SELECT id, profession, description FROM resume")
+            self.__cur.execute(f"SELECT id, profession, description FROM resume WHERE resume_type = '{resume_type}'")
+            res = self.__cur.fetchall()
+            if res: return res
+        except sqlite3.Error as e:
+            print("Ошибка получения вакансии из БД "+str(e))
+
+        return []
+
+    def getResumeAnonceFilterSchedule(self, schedule):
+        try:
+            self.__cur.execute(f"SELECT id, profession, description FROM resume WHERE schedule = '{schedule}'")
             res = self.__cur.fetchall()
             if res: return res
         except sqlite3.Error as e:
